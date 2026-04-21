@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VF-102 DiamondBacks — 2027 Reunion Date Poll</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dark: #8A6A1F;
+    --navy: #0A1628;
+    --navy-mid: #152238;
+    --white: #F4F1EB;
+    --muted: #8A95A8;
+    --preferred: #2ECC8F;
+    --preferred-bg: rgba(46,204,143,0.12);
+    --available: #4A9FD4;
+    --available-bg: rgba(74,159,212,0.12);
+    --conflict: #E05C5C;
+    --conflict-bg: rgba(224,92,92,0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; padding: 0 0 4rem; }
+  .header { background: var(--navy-mid); border-bottom: 1px solid rgba(201,168,76,0.3); padding: 2rem 1.5rem 1.5rem; text-align: center; position: relative; overflow: hidden; }
+  .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 70%); pointer-events: none; }
+  .squadron-label { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 0.25em; color: var(--gold); margin-bottom: 6px; }
+  .header h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(28px,6vw,48px); letter-spacing: 0.05em; color: var(--white); line-height: 1; margin-bottom: 6px; }
+  .header h1 span { color: var(--gold); }
+  .header-sub { font-size: 13px; color: var(--muted); letter-spacing: 0.02em; }
+  .diamond-divider { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 1rem 0 0; }
+  .diamond-divider::before { content: ''; flex: 1; max-width: 80px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-dark)); }
+  .diamond-divider::after { content: ''; flex: 1; max-width: 80px; height: 1px; background: linear-gradient(90deg, var(--gold-dark), transparent); }
+  .diamond { width: 8px; height: 8px; background: var(--gold); transform: rotate(45deg); }
+  .container { max-width: 620px; margin: 0 auto; padding: 0 1.25rem; }
+  .section { margin-top: 2rem; }
+  .section-label { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 1rem; }
+  .name-card { background: var(--navy-mid); border: 1px solid rgba(201,168,76,0.2); border-radius: 10px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem; }
+  .name-card label { font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .name-card input { flex: 1; background: transparent; border: none; border-bottom: 1px solid rgba(201,168,76,0.3); color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 400; padding: 4px 0; outline: none; }
+  .name-card input::placeholder { color: rgba(138,149,168,0.5); }
+  .name-card input:focus { border-bottom-color: var(--gold); }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .leg { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+  .leg-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .option-card { background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.25rem; margin-bottom: 12px; }
+  .opt-id { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--gold); line-height: 1; margin-bottom: 2px; }
+  .opt-dates { font-size: 15px; font-weight: 500; color: var(--white); margin-bottom: 2px; }
+  .opt-detail { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+  .vote-btns { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .vbtn { padding: 6px 14px; font-size: 12px; font-family: 'DM Sans', sans-serif; border-radius: 6px; border: 1px solid rgba(255,255,255,0.12); background: transparent; color: var(--muted); cursor: pointer; font-weight: 400; }
+  .vbtn.active-preferred { background: var(--preferred-bg); border-color: var(--preferred); color: var(--preferred); }
+  .vbtn.active-available { background: var(--available-bg); border-color: var(--available); color: var(--available); }
+  .vbtn.active-conflict { background: var(--conflict-bg); border-color: var(--conflict); color: var(--conflict); }
+  .vbtn.clear-btn { font-size: 11px; padding: 6px 10px; color: rgba(138,149,168,0.5); border-color: transparent; }
+  .bars { display: flex; flex-direction: column; gap: 6px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; }
+  .bar-label { font-size: 11px; color: var(--muted); min-width: 58px; text-transform: capitalize; }
+  .bar-track { flex: 1; background: rgba(255,255,255,0.06); border-radius: 4px; height: 6px; overflow: hidden; }
+  .bar-fill { height: 6px; border-radius: 4px; transition: width 0.4s ease; }
+  .bar-fill.preferred { background: var(--preferred); }
+  .bar-fill.available { background: var(--available); }
+  .bar-fill.conflict { background: var(--conflict); }
+  .bar-count { font-size: 12px; font-weight: 500; color: var(--white); min-width: 16px; text-align: right; }
+  .bar-names { font-size: 10px; color: rgba(138,149,168,0.6); margin-top: 1px; padding-left: 68px; min-height: 14px; line-height: 1.4; }
+  .other-card { background: var(--navy-mid); border: 1px solid rgba(201,168,76,0.15); border-radius: 12px; padding: 1.25rem; margin-bottom: 12px; }
+  .other-toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .other-toggle input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--gold); cursor: pointer; }
+  .other-input-wrap { margin-top: 14px; display: none; }
+  .other-input-wrap.visible { display: block; }
+  .other-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(201,168,76,0.25); border-radius: 8px; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 10px 14px; outline: none; resize: none; }
+  .other-input::placeholder { color: rgba(138,149,168,0.4); }
+  .other-input:focus { border-color: var(--gold); }
+  .submit-btn { width: 100%; padding: 14px; background: var(--gold); color: var(--navy); border: none; border-radius: 10px; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.1em; cursor: pointer; margin-top: 1.5rem; }
+  .submit-btn:hover { background: var(--gold-light); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .status { padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 1rem; display: none; }
+  .status.success { background: var(--preferred-bg); color: var(--preferred); border: 1px solid rgba(46,204,143,0.25); display: block; }
+  .status.danger { background: var(--conflict-bg); color: var(--conflict); border: 1px solid rgba(224,92,92,0.25); display: block; }
+  .results-card { background: var(--navy-mid); border: 1px solid rgba(201,168,76,0.15); border-radius: 12px; padding: 1.25rem; margin-top: 2rem; }
+  .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+  .results-title { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 0.2em; color: var(--gold); }
+  .refresh-btn { font-size: 11px; padding: 4px 12px; background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--muted); border-radius: 6px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .results-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .results-row .opt-tag { font-weight: 500; color: var(--white); font-size: 13px; }
+  .tally { display: flex; gap: 10px; font-size: 11px; }
+  .leader-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.25); color: var(--gold); font-size: 12px; padding: 6px 14px; border-radius: 20px; margin-top: 12px; }
+  .responded-section { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); }
+  .responded-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .responded-names { font-size: 11px; color: rgba(138,149,168,0.7); line-height: 1.7; }
+  .other-results { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); }
+  .other-results-label { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 8px; }
+  .other-result-item { font-size: 12px; color: var(--muted); padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; gap: 10px; }
+  .other-result-item:last-child { border-bottom: none; }
+  .other-result-name { color: var(--gold); font-weight: 500; min-width: 100px; }
+  .live-dot { display: inline-block; width: 7px; height: 7px; background: var(--preferred); border-radius: 50%; margin-right: 6px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="squadron-label">VF-102 · United States Navy</div>
+  <h1>Diamond<span>backs</span></h1>
+  <div class="header-sub">25th Anniversary Reunion · Key West, Florida · 2027</div>
+  <div class="diamond-divider"><div class="diamond"></div></div>
+</div>
+
+<div class="container">
+  <div class="section">
+    <div class="section-label">Date Poll</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:1.25rem;line-height:1.6;">Rate each option — Preferred, Available, or Hard Conflict. If none work, suggest a different date. Results update live for the whole crew.</p>
+
+    <div id="status-msg" class="status"></div>
+
+    <div class="name-card">
+      <label>Your name</label>
+      <input type="text" id="voter-name" placeholder="First name or callsign" autocomplete="off" />
+    </div>
+
+    <div class="legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--preferred)"></div>Preferred</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--available)"></div>Available</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--conflict)"></div>Hard conflict</div>
+    </div>
+
+    <div id="options-list"></div>
+
+    <div class="other-card">
+      <label class="other-toggle">
+        <input type="checkbox" id="other-check" onchange="toggleOther()" />
+        <div>
+          <div style="font-size:14px;font-weight:500;color:var(--white);">None of these work for me</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Suggest a different date window</div>
+        </div>
+      </label>
+      <div class="other-input-wrap" id="other-input-wrap">
+        <textarea class="other-input" id="other-date-input" rows="2" placeholder="e.g. April 10-14 works better for me..."></textarea>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="submit-btn" onclick="submitVote()">Submit My Votes</button>
+  </div>
+
+  <div class="results-card">
+    <div class="results-header">
+      <div class="results-title"><span class="live-dot"></span>Live Results</div>
+      <button class="refresh-btn" onclick="loadVotes()">Refresh</button>
+    </div>
+    <div id="summary-content"><div style="font-size:13px;color:var(--muted);">Loading...</div></div>
+  </div>
+</div>
+
+<script>
+var DB = 'https://diamondbacks-reunion-default-rtdb.firebaseio.com/votes';
+var OPTIONS = [
+  {id:'A', label:'Option A', dates:'March 24-28, 2027', detail:'Wednesday through Sunday'},
+  {id:'B', label:'Option B', dates:'March 26-30, 2027', detail:'Friday through Tuesday'},
+  {id:'C', label:'Option C', dates:'March 31 - April 4, 2027', detail:'Tuesday through Saturday'}
+];
+var STATUSES = ['preferred','available','conflict'];
+var COLORS = {preferred:'#2ECC8F', available:'#4A9FD4', conflict:'#E05C5C'};
+var CBGS = {preferred:'rgba(46,204,143,0.12)', available:'rgba(74,159,212,0.12)', conflict:'rgba(224,92,92,0.12)'};
+var myVotes = {A:null, B:null, C:null};
+var allVotes = {};
+
+function toggleOther(){
+  var c = document.getElementById('other-check').checked;
+  document.getElementById('other-input-wrap').classList.toggle('visible', c);
+}
+
+function setVote(optId, status){
+  myVotes[optId] = status;
+  renderOptions();
+}
+
+function renderOptions(){
+  var total = Object.keys(allVotes).length;
+  var html = '';
+  for(var i=0; i<OPTIONS.length; i++){
+    var o = OPTIONS[i];
+    var counts = {preferred:0, available:0, conflict:0};
+    var names = {preferred:[], available:[], conflict:[]};
+    var keys = Object.keys(allVotes);
+    for(var k=0; k<keys.length; k++){
+      var v = allVotes[keys[k]];
+      var s = v.votes && v.votes[o.id];
+      if(s && counts[s]!==undefined){ counts[s]++; names[s].push(keys[k]); }
+    }
+    var myS = myVotes[o.id];
+    var btnHtml = '';
+    for(var j=0; j<STATUSES.length; j++){
+      var s = STATUSES[j];
+      var active = myS===s;
+      btnHtml += '<button onclick="setVote(\''+o.id+'\',\''+s+'\')" class="vbtn'+(active?' active-'+s:'')+'">'
+        +s.charAt(0).toUpperCase()+s.slice(1)+'</button>';
+    }
+    if(myS) btnHtml += '<button onclick="setVote(\''+o.id+'\',null)" class="vbtn clear-btn">Clear</button>';
+    var barHtml = '';
+    for(var j=0; j<STATUSES.length; j++){
+      var s = STATUSES[j];
+      var pct = total>0 ? Math.round(counts[s]/total*100) : 0;
+      var nms = names[s].slice(0,7).join(', ')+(names[s].length>7?' +more':'');
+      barHtml += '<div class="bar-row">'
+        +'<span class="bar-label">'+s+'</span>'
+        +'<div class="bar-track"><div class="bar-fill '+s+'" style="width:'+pct+'%"></div></div>'
+        +'<span class="bar-count">'+counts[s]+'</span></div>'
+        +(nms?'<div class="bar-names">'+nms+'</div>':'');
+    }
+    html += '<div class="option-card">'
+      +'<div class="opt-id">'+o.label+'</div>'
+      +'<div class="opt-dates">'+o.dates+'</div>'
+      +'<div class="opt-detail">'+o.detail+'</div>'
+      +'<div class="vote-btns">'+btnHtml+'</div>'
+      +'<div class="bars">'+barHtml+'</div>'
+      +'</div>';
+  }
+  document.getElementById('options-list').innerHTML = html;
+}
+
+function renderSummary(){
+  var total = Object.keys(allVotes).length;
+  var html = '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">'+total+' of 30 responded</div>';
+  var best = null, bestScore = -999;
+  for(var i=0; i<OPTIONS.length; i++){
+    var o = OPTIONS[i];
+    var p=0,a=0,c=0;
+    var vals = Object.values(allVotes);
+    for(var k=0; k<vals.length; k++){
+      if(!vals[k].votes) continue;
+      if(vals[k].votes[o.id]==='preferred') p++;
+      else if(vals[k].votes[o.id]==='available') a++;
+      else if(vals[k].votes[o.id]==='conflict') c++;
+    }
+    var score = p*3+a-c*2;
+    if(score>bestScore){ bestScore=score; best=o; }
+    html += '<div class="results-row">'
+      +'<span class="opt-tag">'+o.label+' \u2014 '+o.dates+'</span>'
+      +'<div class="tally">'
+      +'<span style="color:var(--preferred);">'+p+' pref</span>'
+      +'<span style="color:var(--available);">'+a+' avail</span>'
+      +'<span style="color:var(--conflict);">'+c+' conflict</span>'
+      +'</div></div>';
+  }
+  if(best && total>0){
+    html += '<div class="leader-badge"><div style="width:6px;height:6px;background:var(--gold);transform:rotate(45deg);flex-shrink:0;"></div>Leading: '+best.label+' \u2014 '+best.dates+'</div>';
+  } else {
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:8px;">No votes yet \u2014 be the first!</div>';
+  }
+  var others = Object.entries(allVotes).filter(function(e){ return e[1].other; });
+  if(others.length>0){
+    html += '<div class="other-results"><div class="other-results-label">Suggested other dates ('+others.length+')</div>';
+    for(var i=0; i<others.length; i++){
+      html += '<div class="other-result-item"><span class="other-result-name">'+others[i][0]+'</span><span>'+others[i][1].other+'</span></div>';
+    }
+    html += '</div>';
+  }
+  var responded = Object.keys(allVotes);
+  if(responded.length>0){
+    html += '<div class="responded-section"><div class="responded-label">Responded ('+responded.length+'/30)</div>'
+      +'<div class="responded-names">'+responded.join(' \u00b7 ')+'</div></div>';
+  }
+  document.getElementById('summary-content').innerHTML = html;
+}
+
+function showStatus(msg, type){
+  var el = document.getElementById('status-msg');
+  el.textContent = msg;
+  el.className = 'status '+type;
+  setTimeout(function(){ el.className='status'; }, 5000);
+}
+
+function loadVotes(){
+  fetch(DB+'.json')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      allVotes = data || {};
+      renderOptions();
+      renderSummary();
+    })
+    .catch(function(e){
+      document.getElementById('summary-content').innerHTML = '<div style="font-size:13px;color:var(--conflict);">Could not load votes: '+e.message+'</div>';
+    });
+}
+
+function submitVote(){
+  var name = document.getElementById('voter-name').value.trim();
+  if(!name){ showStatus('Please enter your name or callsign.','danger'); return; }
+  var hasVote = myVotes.A||myVotes.B||myVotes.C;
+  var otherChecked = document.getElementById('other-check').checked;
+  var otherText = document.getElementById('other-date-input').value.trim();
+  if(!hasVote && !otherChecked){ showStatus('Please rate at least one option.','danger'); return; }
+  if(otherChecked && !otherText){ showStatus('Please enter your suggested date.','danger'); return; }
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  var safeKey = name.replace(/[.#$\/\[\]]/g,'_');
+  var data = {votes:{A:myVotes.A,B:myVotes.B,C:myVotes.C}, other:(otherChecked&&otherText)?otherText:null, timestamp:Date.now()};
+  fetch(DB+'/'+safeKey+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+    .then(function(r){
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      showStatus('Vote saved \u2014 thanks, '+name+'!','success');
+      loadVotes();
+    })
+    .catch(function(e){ showStatus('Could not save: '+e.message,'danger'); })
+    .finally(function(){ btn.disabled=false; btn.textContent='Submit My Votes'; });
+}
+
+renderOptions();
+loadVotes();
+setInterval(loadVotes, 30000);
+</script>
+</body>
+</html>
